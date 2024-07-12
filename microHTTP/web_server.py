@@ -1,5 +1,6 @@
 import socket
 import time
+import traceback
 
 
 class Server(socket.socket):
@@ -39,19 +40,16 @@ class Server(socket.socket):
             if b'\r\n\r\n' in buffer:
                 raw_headers, self._body_buffer = buffer.split(b'\r\n\r\n', maxsplit=1)
                 self._parse_headers(raw_headers)
-                try:
-                    handler = self._class_handler()
-                    handler.set_headers(self._headers)
-                    handler.set_path(self._path)
-                    handler.set_http_ver(self._http_ver)
-                    handler.set_method(self._method)
-                    self._recv_body(handler.get_len_body)
-                    handler.set_body(self._body_buffer)
-                    handler.handle()
-                    self._context_connect.sendall(handler.get_response_raw())
-                finally:
-                    self._context_connect.close()
-                    break
+                handler = self._class_handler(views=self._handler_args)
+                handler.set_headers(self._headers)
+                handler.set_path(self._path)
+                handler.set_http_ver(self._http_ver)
+                handler.set_method(self._method)
+                self._recv_body(handler.get_len_body)
+                handler.set_body(self._body_buffer)
+                handler.handle()
+                self._context_connect.sendall(handler.get_response_raw())
+                self._context_connect.close()
 
     def _recv_body(self, nbytes: int):
         while len(self._body_buffer) < nbytes:

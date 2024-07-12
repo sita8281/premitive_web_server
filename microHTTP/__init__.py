@@ -1,6 +1,13 @@
+from .default_templates import DefaultTemplates
+
+def_tmpl = DefaultTemplates()
+
 from .handler import Handler
 from .web_server import Server
+from .web_framework import Response,Request
 
+
+req = Request({}, '', '', '', {}, {}, b'')
 
 class BaseHttpHandler(Handler):
     pass

@@ -7,7 +7,8 @@ class DefaultTemplates:
     def __get_file_html(self, name: str):
         normalize_path = os.path.join(os.path.dirname(__file__), name)
         with open(file=normalize_path, mode='rb') as file:
-            return file.read(), file.__sizeof__()
+            data = file.read()
+            return data, len(data)
 
     @property
     def get_405(self):
